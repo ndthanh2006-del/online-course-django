@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import TabularInline
-from .models import Course, Lesson, Question, Choice, Submission
+from .models import Course, Lesson, Instructor, Learner, Question, Choice, Submission
 
 
 class ChoiceInline(TabularInline):
