@@ -1,0 +1,34 @@
+{% extends "onlinecourse/base.html" %}
+{% block title %}Exam Results{% endblock %}
+{% block content %}
+<div class="bg-white p-4 rounded shadow-sm">
+  {% if submission.total_questions and submission.score == submission.total_questions %}
+    <div class="alert alert-success"><h1 class="h3 mb-1">Congratulations!</h1>You successfully answered every question.</div>
+  {% elif submission.score > 0 %}
+    <div class="alert alert-info"><h1 class="h3 mb-1">Good effort!</h1>Review the answers below and try again.</div>
+  {% else %}
+    <div class="alert alert-warning"><h1 class="h3 mb-1">Keep practicing!</h1>Review the lessons and try again.</div>
+  {% endif %}
+  <h2 class="h4">{{ submission.course.name }} - Exam Results</h2>
+  <p class="lead">Score: <strong>{{ submission.score }} / {{ submission.total_questions }}</strong> ({{ submission.percentage }}%)</p>
+  <h3 class="h5 mt-4">Exam results</h3>
+  {% for question_id, result in submission.answers.items %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <p class="fw-semibold">{{ result.question }}</p>
+        <p class="mb-1">Your answer: {{ result.selected }}</p>
+        {% if result.correct %}
+          <span class="badge text-bg-success">Correct</span>
+        {% else %}
+          <span class="badge text-bg-danger">Incorrect</span>
+          <p class="mt-2 mb-0">Correct answer: {{ result.correct_answer }}</p>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <p>No questions were included in this attempt.</p>
+  {% endfor %}
+  <a class="btn btn-primary" href="{% url 'onlinecourse:course_details' submission.course.id %}">Try again</a>
+  <a class="btn btn-outline-secondary" href="/">All courses</a>
+</div>
+{% endblock %}

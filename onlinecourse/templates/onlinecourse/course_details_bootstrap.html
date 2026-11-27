@@ -1,0 +1,49 @@
+{% extends "onlinecourse/base.html" %}
+{% block title %}{{ course.name }}{% endblock %}
+{% block content %}
+<div class="bg-white p-4 rounded shadow-sm">
+  <h1 class="mb-2">{{ course.name }}</h1>
+  <p class="text-muted">{{ course.description }}</p>
+  <h2 class="h4 mt-4">Course lessons</h2>
+  {% for lesson in course.lessons.all %}
+    <section class="card mb-3">
+      <div class="card-header"><strong>Lesson {{ forloop.counter }}: {{ lesson.title }}</strong></div>
+      <div class="card-body">
+        <p>{{ lesson.content }}</p>
+        {% for question in lesson.questions.all %}
+          <p class="mb-1">{{ question.question_text }}</p>
+        {% empty %}
+          <p class="text-muted">No assessment question for this lesson.</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% empty %}
+    <p>No lessons have been added yet.</p>
+  {% endfor %}
+
+  <hr class="my-4">
+  <h2 class="h4">Mock exam</h2>
+  <p class="text-muted">Choose one answer for each question, then submit your attempt.</p>
+  <form method="post" action="{% url 'onlinecourse:submit' course.id %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label" for="student_name">Your name (optional)</label>
+      <input class="form-control" id="student_name" name="student_name" maxlength="120" placeholder="Guest">
+    </div>
+    {% for lesson in course.lessons.all %}
+      {% for question in lesson.questions.all %}
+        <fieldset class="border rounded p-3 mb-3">
+          <legend class="float-none w-auto px-2 fs-6 fw-semibold">{{ forloop.parentloop.counter }}. {{ question.question_text }}</legend>
+          {% for choice in question.choices.all %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="choice_{{ choice.id }}" value="{{ choice.id }}" required>
+              <label class="form-check-label" for="choice_{{ choice.id }}">{{ choice.choice_text }}</label>
+            </div>
+          {% endfor %}
+        </fieldset>
+      {% endfor %}
+    {% endfor %}
+    <button class="btn btn-success btn-lg" type="submit">Submit exam</button>
+  </form>
+</div>
+{% endblock %}
